@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+
+    postgres:
+      image: postgres:latest
+      container_name: postgres
+      volumes:
+        - ./Postgres/1-drop-schema-postgres.sql:/docker-entrypoint-initdb.d/1-drop-schema-postgres.sql
+        - ./Postgres/2-create-schema-postgres.sql:/docker-entrypoint-initdb.d/2-create-schema-postgres.sql
+      ports:
+       - 5432:5432
+      environment:
+        - POSTGRES_DB=postgres_db
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=pwd123
+
+
