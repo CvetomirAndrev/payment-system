@@ -20,7 +20,7 @@ public class Merchant extends User {
 
     // TODO : add validation to only sym Transactions that are Charge and approve
     @Column(name = "total_transaction_sum")
-    @Formula("select sum(t.amount) from Transactions t where t.reference_id = :id")
+//    @Formula("select sum(t.amount) from Transactions t where t.reference_id = :id")
     private Long totalTransactionSum;
 
     @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "referenceId")
