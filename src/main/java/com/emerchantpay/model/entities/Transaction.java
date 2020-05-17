@@ -1,14 +1,21 @@
 package com.emerchantpay.model.entities;
 
 import com.emerchantpay.model.enums.TransactionStatus;
-import lombok.Data;
+import com.emerchantpay.model.enums.TransactionType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Entity
-@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class Transaction {
 
     @Id
@@ -19,26 +26,33 @@ public class Transaction {
     )
     private String id;
 
-    @Min(value = 1, message = "Amount must be greater than zero")
+    @Min(value = 0, message = "Amount must be greater or equal zero")
     private Long amount;
 
-    @Column(name = "transaction_status")
-    private TransactionStatus transactionStatus;
+    //  TODO : add validation for status
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus status;
 
     //  TODO : add validation for email
     @Column(name = "customer_email")
     private String customerEmail;
 
-    //  TODO : add validation for phone
     @Column(name = "customer_phone")
     private String customerPhone;
 
+    //  TODO : add validation for type
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
+
     @ManyToOne(cascade = {CascadeType.MERGE})
+    @NotNull
     private Merchant referenceId;
 
-    // TODO don't like this to reference to parent Transaction
-    @Column(name = "belong_to")
-    private String belongTo;
-
+    @ManyToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "initial_transaction_id")
+    @JsonIgnore
+    private Transaction initialTransaction;
 
 }

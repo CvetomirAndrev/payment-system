@@ -1,28 +1,33 @@
 package com.emerchantpay.model.entities;
 
 
-import com.emerchantpay.model.enums.MerchantStatus;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("M")
-@Data
+@Getter
+@Setter
 public class Merchant extends User {
 
-    @Column(name = "merchant_status")
-    private MerchantStatus merchantStatus;
+    @Column(name = "status")
+    @NotNull
+    private boolean active;
 
-    // TODO : add validation to only sym Transactions that are Charge and approve
-    @Column(name = "total_transaction_sum")
-//    @Formula("select sum(t.amount) from Transactions t where t.reference_id = :id")
+    // TODO : add validation to check only Approve AUTHORIZE_TRANSACTION
+    @Transient
+    @Formula("(select sum(t.amount) from paymentsystem.transaction as t where t.referenceid_id = id and t.type = 'CHARGE' And t.status = 'APPROVED')")
     private Long totalTransactionSum;
 
     @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "referenceId")
+    @JsonIgnore
     private List<Transaction> transactions;
 }
