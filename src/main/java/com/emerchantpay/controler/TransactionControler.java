@@ -2,9 +2,9 @@ package com.emerchantpay.controler;
 
 import com.emerchantpay.model.dto.request.TransactionRequestDto;
 import com.emerchantpay.model.dto.response.TransactionResponseDto;
+import com.emerchantpay.model.entities.Transaction;
 import com.emerchantpay.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,10 +23,8 @@ public class TransactionControler {
     }
 
 
-    // TODO : RETURN Created Transaction
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createTransaction(@RequestBody TransactionRequestDto transactionDto) {
-        transactionService.createTransaction(transactionDto);
+    public Transaction createTransaction(@RequestBody TransactionRequestDto transactionDto) {
+        return transactionService.createTransaction(transactionDto);
     }
 }

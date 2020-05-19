@@ -1,7 +1,7 @@
 package com.emerchantpay.model.enums;
 
 
-import com.emerchantpay.exeptions.TransactionExeption;
+import com.emerchantpay.exeptions.TransactionCreateException;
 import com.emerchantpay.model.dto.request.TransactionRequestDto;
 import com.emerchantpay.model.entities.Transaction;
 import com.emerchantpay.service.TransactionState;
@@ -14,12 +14,12 @@ public enum TransactionType implements TransactionState {
         @Override
         public Transaction createTransaction(TransactionRequestDto transactionDto, Transaction relatedTransaction) {
             if (relatedTransaction != null) {
-                throw new TransactionExeption("Authorize Transaction cant relate to other transaction");
+                throw new TransactionCreateException("Authorize Transaction cant relate to other transaction");
             }
             return buildTransaction(transactionDto, null, APPROVED);
         }
     },
-    // TODO: Organize the validation. There is duplicate code
+    // TODO: Organize the validation. The validation for transactionType and TransactionStatus can be extracted
     CHARGE {
         @Override
         public Transaction createTransaction(TransactionRequestDto transactionDto, Transaction relatedTransaction) {
@@ -28,7 +28,7 @@ public enum TransactionType implements TransactionState {
                 return buildTransaction(transactionDto, relatedTransaction, ERROR);
             }
             if (transactionDto.getAmount() > relatedTransaction.getAmount()) {
-                throw new TransactionExeption("Charge Transaction amount need to lower that Authorize transaction amount with id "
+                throw new TransactionCreateException("Charge Transaction amount need to lower that Authorize transaction amount with id "
                         + relatedTransaction.getId() + " and customer email " + relatedTransaction.getCustomerEmail());
             }
             relatedTransaction.setAmount(relatedTransaction.getAmount() - transactionDto.getAmount());
@@ -81,7 +81,7 @@ public enum TransactionType implements TransactionState {
 
     private static void validateTransactionType(Transaction relatedTransaction, String msg, TransactionType type) {
         if (relatedTransaction == null || relatedTransaction.getType() != type) {
-            throw new TransactionExeption(msg + " Transaction need relation to " + type + " transaction");
+            throw new TransactionCreateException(msg + " Transaction need relation to " + type + " transaction");
         }
     }
 

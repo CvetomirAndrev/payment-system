@@ -18,20 +18,23 @@ public class TransactionService {
     @Autowired
     private UserRepository<Merchant> userRepository;
 
-    //TODO: Unit test  Integration test
+    //TODO: Integration test
     @Transactional
-    public void createTransaction(TransactionRequestDto transactionDto) {
+    public Transaction createTransaction(TransactionRequestDto transactionDto) {
         Merchant merchant = userRepository.findById(transactionDto.getMerchantId()).orElse(null);
-        if (merchant != null && merchant.isActive()) {
-
-            Transaction relatedTransaction =
-                    transactionDto.getBelongTo() != null ? transactionRepository.findById(transactionDto.getBelongTo()).orElse(null) : null;
-            Transaction result = transactionDto.getTransactionType().createTransaction(transactionDto, relatedTransaction);
-            if (relatedTransaction != null) {
-                transactionRepository.save(relatedTransaction);
-            }
-            result.setReferenceId(merchant);
-            transactionRepository.save(result);
+        if (merchant == null || !merchant.isActive()) {
+            return null;
         }
+        Transaction relatedTransaction =
+                transactionDto.getBelongTo() != null ? transactionRepository.findById(transactionDto.getBelongTo()).orElse(null) : null;
+        Transaction result = transactionDto.getTransactionType().createTransaction(transactionDto, relatedTransaction);
+        if (relatedTransaction != null) {
+            transactionRepository.save(relatedTransaction);
+        }
+        result.setReferenceId(merchant);
+        transactionRepository.save(result);
+        return result;
     }
+
+
 }
